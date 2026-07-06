@@ -13,6 +13,20 @@ RSS(rss.xml)는 최신 10건만 제공하므로, 이 스크립트는 그 API를 
 
 출력: 표준출력에 JSON 배열 (title, company, link, publishDate ISO8601)
       해당 날짜에 글이 없으면 빈 배열 []을 출력한다.
+
+참고: Claude(Cowork)의 샌드박스 환경에서는 outbound 네트워크가 allowlist로 제한되어
+있어, 이 스크립트를 bash로 직접 실행하면 techblogposts.com 요청이 프록시에서 차단될
+수 있습니다. Cowork의 매일 09:00 자동화 작업은 이 스크립트 대신 브라우저(Claude in
+Chrome)의 fetch()로 동일한 /api/v1/posts 엔드포인트를 호출하는 방식을 사용합니다.
+이 스크립트는 사용자의 로컬 머신 등 네트워크 제약이 없는 환경에서 그대로 사용할 수
+있도록 남겨둔 참고/백업용 구현입니다.
+
+velopers.kr 병합: velopers.kr(https://www.velopers.kr/)은 techblogposts.com과 별도의
+두 번째 소스로, 커서 API 대신 목록 페이지(`/?page=N`, 발행일 내림차순)를 순회해 대상
+날짜의 글을 찾고, 각 글의 상세 페이지(`/post/{id}`)에서 원문 링크와 요약을 가져옵니다.
+두 소스 결과는 원문 링크 기준으로 중복 제거한 뒤 합쳐 하루치 파일을 만듭니다. 이 스크립트
+자체는 techblogposts.com 전용이며, velopers.kr 수집 로직은 자동화 작업(스케줄 프롬프트)
+안에 동일한 브라우저 fetch 방식으로 구현되어 있습니다.
 """
 
 import sys
