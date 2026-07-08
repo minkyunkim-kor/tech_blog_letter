@@ -33,3 +33,5 @@ tech_blog_letter/
 ## 자동화
 
 매일 09:00 KST에 스케줄 작업이 실행되어, 전일(KST) 발행된 글을 techblogposts.com과 velopers.kr에서 각각 수집·중복 제거한 뒤 `posts/`에 파일을 추가하고 GitHub에 커밋·푸시합니다. 해당 날짜에 새 글이 없으면 파일을 생성하지 않습니다. 푸시가 끝나면 그날의 글 모음과 요약을 Telegram으로 전송합니다.
+
+무인 실행 특성상 사람이 권한 프롬프트에 응답할 수 없으므로, FUSE 마운트 환경에서 죽은 프로세스가 남긴 stale `.git/*.lock` 파일을 `rm -f`로 정리하는 것만 `.claude/settings.json`의 `permissions.allow`에 좁게 허용해두었습니다(2026-07-08).
