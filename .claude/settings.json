@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f .git/*.lock)",
+      "Bash(rm -f .git/refs/heads/*.lock)"
+    ]
+  }
+}
