@@ -1,0 +1,50 @@
+<!-- 이 파일은 posts/2026-07-14.md의 사본입니다. 자동 생성됨. -->
+# 2026-07-14 기술 블로그 모음
+
+## [Amazon Aurora 및 Amazon RDS의 PostgreSQL 18: 성능 향상](https://aws.amazon.com/ko/blogs/tech/database-postgresql-18-on-amazon-aurora-and-amazon-rds-performance-enhancements/)
+- 회사: AWS
+- 본문 요약: PostgreSQL 18의 성능 향상 기능을 Amazon Aurora/RDS 관점에서 정리한 2부작 중 1부다. 다중 컬럼 인덱스를 위한 스킵 스캔 최적화, EXPLAIN ANALYZE의 자동 버퍼 통계 및 구체화(MATERIALIZED) 노드의 메모리/디스크 스토리지 가시성, 불필요한 셀프 조인 자동 제거(SJE), autovacuum_vacuum_max_threshold를 통한 대용량 테이블 vacuum 상한 제어, vacuum_truncate 전역 GUC, autovacuum_worker_slots를 통한 워커 수 런타임 조정, 테이블별 vacuum/analyze 누적 소요시간 컬럼을 실습 예제와 함께 설명한다.
+- 주목할 point: 별도 인덱스 추가 없이 스킵 스캔만으로 21배 성능 향상을 확인한 벤치마크, 10억 행 테이블에서 autovacuum 트리거 임계값이 2억에서 1억으로 제한되는 사례, vacuum_truncate=off로 읽기 전용 복제본의 "conflict with recovery" 쿼리 취소 문제를 완화할 수 있다는 점이 실무적이다.
+- keyword: #PostgreSQL #AmazonAurora #AmazonRDS #Autovacuum
+
+## [MATCH란 무엇인가](https://techblog.musinsa.com/match%EB%9E%80-%EB%AC%B4%EC%97%87%EC%9D%B8%EA%B0%80-5776910908af)
+- 회사: 무신사
+- 본문 요약: 무신사가 데이터를 매출로 전환하기 위해 구축한 의사결정 레이어 MATCH(Musinsa Audience Targeting & Customer Hub)를 소개한다. 기존 규칙(Rule) 기반 오디언스 정의는 조건 조합에 따라 결과가 크게 달라지고 소재 충돌 시 배정 기준이 마케터의 직관에 의존해야 했던 한계를 짚고, 유저 행동 데이터와 소재 메타 정보를 함께 학습해 "이 소재에 가장 잘 반응할 유저"를 AI가 직접 발굴하는 방식으로 전환한 과정과 앱 푸시 채널 적용 성과를 다룬다.
+- 주목할 point: "소재 기획과 최종 검토는 마케터, 타겟 선별과 발송 실행은 시스템"이라는 책임 경계를 명확히 세우고, 발송 후 반응 시그널이 다음 캠페인 정확도를 높이는 자동화된 피드백 루프를 만들어 담당자가 바뀌어도 마케팅 자산이 리셋되지 않도록 한 점.
+- keyword: #무신사 #Personalization #CDP #머신러닝
+
+## [천만 MAU를 지탱하는 커뮤니티 시스템을 소개해요](https://medium.com/daangn/%EC%B2%9C%EB%A7%8C-mau%EB%A5%BC-%EC%A7%80%ED%83%B1%ED%95%98%EB%8A%94-%EC%BB%A4%EB%AE%A4%EB%8B%88%ED%8B%B0-%EC%8B%9C%EC%8A%A4%ED%85%9C%EC%9D%84-%EC%86%8C%EA%B0%9C%ED%95%B4%EC%9A%94-090fb4021e20)
+- 회사: 당근마켓
+- 본문 요약: 월간 활성 사용자(MAU) 천만을 넘긴 당근 커뮤니티(동네생활·모임·카페·아파트) 시스템의 구조를 소개한다. 여러 웹앱과 하나의 서버앱(모듈형 모놀리스)으로 나누고, 서버앱 내부는 요청 처리(api)·이벤트 처리(worker)·정기 작업(batch)·운영 도구(console) 4개 실행 단위로 분리했으며, 모듈화·리팩토링·디자인 패턴/모델링·자동화 테스트 네 가지 방법으로 경계를 관리해온 과정과 Streaming SSR, OpenAPI 계약 기반 코드 생성, 실제 장애 대응 경험을 폭넓게 다룬다.
+- 주목할 point: "단순함은 복잡성이 없는 상태가 아니라, 복잡성이 이름 붙은 경계 안에서 다뤄지는 상태"라는 관점과, 화면 단위 API가 늘어나며 생긴 반복 비용을 해결하기 위해 리소스 중심 API로 전환하려는 다음 단계 과제 제시가 인상적이다.
+- keyword: #당근마켓 #ModularMonolith #SoftwareArchitecture #SSR
+
+## [순서대로, 한 번만, 빠르게](https://engineering.ab180.co/stories/kafka-event-ordering-at-scale)
+- 회사: AB180
+- 본문 요약: Airbridge의 Kafka 이벤트 처리에서 마이크로 배치 방식 탓에 느린 이벤트 하나가 전체 배치를 막아 서버를 늘려도 처리 속도가 늘지 않던 문제를, Project Differential로 해결한 과정을 소개한다. 하나의 Kafka topic을 이벤트 종류별 Consumer가 각자 읽되 뒤 Consumer가 앞 Consumer의 처리 위치를 추월하지 않는 안전거리를 두고, Normal Mode(버퍼 재사용)와 Polling Mode(직접 조회)를 전환하며 CommitManager로 offset을 안전하게 관리해 순서 보장과 중복 방지를 유지한 채 처리 속도를 10배 이상 높였다.
+- 주목할 point: Flink/Spark의 Watermark 개념에서 "완벽한 전역 순서 보장은 사실상 실시간 처리를 불가능하게 만든다"는 힌트를 얻어, 전역 순서 대신 워크로드 특성에 맞는 허용 범위 내 best-effort 순서로 설계 방향을 잡은 점.
+- keyword: #AB180 #Kafka #스트림처리 #백엔드아키텍처
+
+## [LLM 자동번역: 중첩 객체와 목록 구조 확장](https://www.nextree.io/llm-jadongbeonyeog-jungceob-gaegcewa-mogrog-gujo-hwagjang/)
+- 회사: 넥스트리
+- 본문 요약: 엔티티 직접 필드 중심이던 LLM 자동번역 기능을 엔티티 내부의 중첩 값 객체와 목록 구조까지 확장한 경험을 정리했다. 목록의 index는 요청 시점과 완료 반영 시점의 대상이 달라질 위험이 있어 안정적인 식별자로 보기 어렵다고 판단해 특정 index만 번역하는 API는 배제하고 목록 전체를 번역 대상으로 처리했으며, 사용자는 중첩 필드명과 내부 다국어 필드명만 전달하면 되도록 requestNestedTranslation API로 단순화했다.
+- 주목할 point: 번역 성공 이벤트는 공통 라이브러리가 reflection으로 자동 반영하지만, 실패 이후 정책은 서비스마다 다를 수 있다는 이유로 실패 처리만은 서비스가 직접 담당하도록 책임 경계를 남겨둔 설계.
+- keyword: #LLM #자동번역 #API설계 #ValueObject
+
+## [React 환경에서 중복 API 요청 개선](https://www.nextree.io/react-hwangyeongeseo-jungbog-api-yoceong-gaeseon/)
+- 회사: 넥스트리
+- 본문 요약: 로그인 이후 사용자·권한·업무 정보를 전역 Context에 저장해 여러 화면에서 공유하는 구조에서, 인증/Context 상태 변경이 연쇄적으로 useEffect를 재실행시켜 동일 API가 중복 호출되고 오래된 응답이 최신 데이터를 덮어쓰는 문제가 발생한 원인을 분석했다. Debounce는 입력 이벤트가 아닌 상태 변경 문제에는 맞지 않아 배제하고, AbortController로 진행 중 요청을 취소하고 요청 식별자(runId)로 최신 요청 여부를 검증하며, 의존관계 없는 요청은 Promise.all로 병렬 처리해 해결했다.
+- 주목할 point: AbortController만으로는 응답 반환 시점과 취소 시점이 겹치는 레이스 컨디션을 완전히 막을 수 없어, runId 기반 검증을 추가로 도입해야 했다는 점 — 요청 취소보다 "어떤 응답을 신뢰할 것인가"를 관리하는 것이 더 중요한 문제였다는 회고.
+- keyword: #React #AbortController #RaceCondition #프론트엔드
+
+## [\[23. 5. 30\] FDA PCCP 가이던스 분석](https://medium.com/aitrics/23-5-30-fda-pccp-%EA%B0%80%EC%9D%B4%EB%8D%98%EC%8A%A4-%EB%B6%84%EC%84%9D-7ea0a6c5e8fe)
+- 회사: AITRICS
+- 본문 요약: FDA가 발행한 PCCP(Predetermined Change Control Plan) 가이던스를 ML 기반 의료기기(ML-DSF) 관점에서 알기 쉽게 정리했다. PCCP를 Description of Modifications, Modification Protocol, Impact Assessment 세 챕터로 구성하는 방법과 각 챕터의 요구사항, PCCP에 포함할 수 있는 변경 유형(성능 개선을 위한 재학습, input 소스 추가, 특정 하위집단으로의 사용 확장 등), Patient Monitor Software를 예로 든 승인 후 변경 시나리오를 설명한다.
+- 주목할 point: FDA에 승인된 PCCP 범위 내에서 이뤄진 변경(예: 재학습을 통한 오탐률 개선)은 추가 마케팅 제출 없이 반영할 수 있지만, PCCP에 명시되지 않은 새로운 성능 주장(예: 상태 악화를 사전에 예측하는 기능 추가)은 안전성·효과에 영향을 줄 수 있어 별도 제출이 필요하다는 구분.
+- keyword: #FDA #PCCP #의료기기규제 #AITRICS
+
+## [\[23. 5. 23\] 에이아이트릭스, ICLR TML4H 워크샵 '환자 악화 예측 모델'최고 논문상 수상](https://medium.com/aitrics/23-5-23-%EC%97%90%EC%9D%B4%EC%95%84%EC%9D%B4%ED%8A%B8%EB%A6%AD%EC%8A%A4-iclr-tml4h-%EC%9B%8C%ED%81%AC%EC%83%B5-%ED%99%98%EC%9E%90-%EC%95%85%ED%99%94-%EC%98%88%EC%B8%A1-%EB%AA%A8%EB%8D%B8%EC%B5%9C%EA%B3%A0-%EB%85%BC%EB%AC%B8%EC%83%81-%EC%88%98%EC%83%81-f90e88bebbf1)
+- 회사: AITRICS
+- 본문 요약: AITRICS 연구팀이 ICLR 2023 TML4H 워크숍에서 "Self-Supervised Predictive Coding with Multimodal Fusion for Patient Deterioration Prediction in Fine-grained Time Resolution" 논문으로 최고 논문상을 수상한 소식을 전한다. 생체신호·검사·주호소 텍스트 등 이질적 EHR 데이터를 Multimodal Bottleneck/Cross-Modal Attention Transformer로 융합하고, 미래 악화와 미래 생체신호를 함께 예측하는 자기지도(Self-Supervised) 학습으로 기존 0~24/48시간 단위 대신 1시간 단위의 정밀한 예측을 구현했다.
+- 주목할 point: 상대적으로 느리게 변하는 주호소 텍스트 데이터("Slow feature")를 결합했을 때 가까운 미래 예측 성능은 유지하면서 먼 미래 예측 성능이 향상됐다는 관찰, 1시간 단위 예측 해상도가 응급 상황의 신속한 의사결정과 자원 배분에 기여할 수 있다는 점.
+- keyword: #ICLR #의료AI #MultimodalLearning #AITRICS
